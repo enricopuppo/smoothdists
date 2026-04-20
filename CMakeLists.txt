@@ -1,6 +1,6 @@
 # Many pieces of this file came from libigl-example-project and gptoolbox for mex compilation.
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 4.0)
 project(smooth_distance LANGUAGES CXX)
 
 set(CMAKE_BUILD_TYPE Release)
@@ -49,8 +49,12 @@ target_link_libraries(barnes_hut_smoothness_test smooth_dist_cpu igl::core igl::
 add_executable(rigid_body_simulator app/rigid_body_simulator.cpp)
 target_link_libraries(rigid_body_simulator smooth_dist_cpu igl::core igl::opengl igl::glfw igl::imgui igl::png)
 
-pybind11_add_module(smoothdists_bindings plugin/smoothdists_bindings.cpp)
-target_link_libraries(smoothdists_bindings PUBLIC smooth_dist_cpu igl::core igl::opengl igl::glfw igl::imgui igl::png)
+if(SMOOTHDISTS_PYTHON_BINDINGS_AVAILABLE)
+  pybind11_add_module(smoothdists_bindings plugin/smoothdists_bindings.cpp)
+  target_link_libraries(smoothdists_bindings PUBLIC smooth_dist_cpu igl::core igl::opengl igl::glfw igl::imgui igl::png)
+else()
+  message(STATUS "Skipping smoothdists_bindings because Python development headers were not found.")
+endif()
 
 # mex compilation
 if(Matlab_FOUND)
